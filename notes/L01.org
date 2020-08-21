@@ -1,8 +1,8 @@
-# Instruction
+* Instruction
 
-## outline of the course
+** outline of the course
 
-### Module 1
+*** Module 1
 
 - Binary representation and operations
 - RISC-V ISA
@@ -10,7 +10,7 @@
 - Expressing high-level programming in assembly language
 - Procedure calling convention
 
-### Module 2
+*** Module 2
 
 - Digital abstraction
 - Boolean algebra and combinational logic
@@ -19,7 +19,7 @@
 - Logic synthesis
 - Pipelined and folded circuits
 
-### Module 3
+*** Module 3
 
 - Implement non-pipelined RISC-V computer
 - Caches
@@ -27,12 +27,12 @@
   - control and data hazards, bypasses
 - Branch prediction (**time permitting**)
 
-### Module 4
+*** Module 4
 
 - Operating systems
 - I/O interrupts and exceptions
 - Virtual memory
 
-### Module 5
+*** Module 5
 
 - Parrllel programming and multicore issues sysnchronization, cache coherence

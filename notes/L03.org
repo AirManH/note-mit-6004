@@ -1,0 +1,169 @@
+* Compiling Code, Procedures and Stacks
+
+** Dealing with Constants
+
+*** Small constants
+
+in 12-bit
+
+use =addi=
+
+*** Large constants
+
+in 20-bit
+
+use =lui= (load upper immediately)
+
+Example:
+
+#+BEGIN_SRC asm
+li x4, 0x123456
+#+END_SRC
+
+->
+
+#+BEGIN_SRC asm
+lui x4, 0x123       ; x4 = 0x123000, limit here is 20 bits
+addi x4, x4, 0x456  ; limit here is 12 bits
+#+END_SRC
+
+Another example:
+
+#+BEGIN_SRC asm
+li x4, 0x12
+#+END_SRC
+
+->
+
+#+BEGIN_SRC asm
+addi x4, x4, 0x12
+#+END_SRC
+
+** Compiling Loops
+
+An interesting example:
+
+C code:
+
+#+BEGIN_SRC C
+while (expr) {
+    while-body
+}
+#+END_SRC
+
+can be translated into:
+
+#+BEGIN_SRC asm
+while:
+    (compile expr into xN)
+    beqz xN, endwhile
+    (compile while-body)
+    j while
+endwhile:
+#+END_SRC
+
+and can be optimized (only 1 control instruction on 1 iteration) as:
+
+#+BEGIN_SRC asm
+j compare
+while:
+    (compile while-body)
+compare:
+    (compile expr into xN)
+    bnez xN, while
+#+END_SRC
+
+** RISC-V Stack
+
+#+BEGIN_SRC text
+STACK
+
+-----  lower address
+|   |
+-----       /\
+|   |      /||\ Push
+-----       ||
+ ...        ||
+-----
+|   |  higher address
+-----
+#+END_SRC
+
+*** stack pointer
+
+Point to the top of stack. (=sp= is /x2/)
+
+- Pop: sp+
+- Push: sp-
+
+Example:
+
+#+BEGIN_SRC asm
+addi sp, sp, -8
+sw ra, 0(sp)
+sw a0, 4(sp)
+
+lw ra, 0(sp)
+lw a0, r(sp)
+#+END_SRC
+
+** Calling Convention
+
+| Symbolic name | Registers     | Description              | Saver    |
+| =a0= - =a7=   | x10 - x17     | Function *arguments*     | Caller   |
+| =a0= and =a1= | x10 and x11   | Function *return* values | Caller   |
+| =ra=          | x1            | *Return address*         | Caller   |
+| =t0= - =t6=   | x5-7, x28-312 | Temporaries              | Caller   |
+| =s0= - =s11=  | x8-9, x18-27  | Saved registers          | *Callee* |
+| =sp=          | x2            | Stack pointer            | *Callee* |
+| =gp=          | x3            | Global pointer           | ---      |
+| =tp=          | x4            | Thread pointer           | ---      |
+| =zero=        | x0            | Hardwired zero           | ---      |
+
+*** Using CALLEE-saved registers
+
+#+BEGIN_SRC cpp
+int f(int x, int y) {
+    return (x + 3) | (y + 123456);
+}
+#+END_SRC
+
+#+BEGIN_SRC asm
+
+addi sp, sp, -8  // allocate 2 words (8 bytes) on stack
+sw s0, 4(sp)     // save s0
+sw s1, 0(sp)     // save s1
+
+addi s0, a0, 3
+li s1, 123456
+add s1, a1, s1
+or a0, s0, s1
+
+lw s1, 0(sp)     // restore s1
+lw s0, 4(sp)     // restore s0
+addi sp, sp, 8   // deallocate 2 words from stack
+
+ret
+#+END_SRC
+
+*** Using CALLER-saved registers
+
+#+BEGIN_SRC cpp
+// Caller
+int x = 1;
+int y = 2;
+int z = sum(x, y);
+int w = sum(z, y);
+#+END_SRC
+
+#+BEGIN_SRC asm
+li a0, 1
+li a1, 2
+addi sp, sp, -8
+sw ra, 0(sp)
+sw a1, 4(sp)  // save y
+jal ra, sum
+// a0 = sum(x, y)
+lw a1, 4(sp)  // restore y
+jal ra, sum
+#+END_SRC
