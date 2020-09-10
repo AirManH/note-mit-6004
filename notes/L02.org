@@ -28,7 +28,8 @@
 hard-coded constant number
 
 - =addi= (no =subi= here, because =addi x3, x1, -3= is enough. It's no need to reimplement another almost same operation)
-- =slti=, =sltiu=
+- =slti=, =sltiu= (Set Less Than Immediately Unsigned)
+  - Example: =sltiu a0, a0, 2= will set =a0 = 1= only when =a0 < 2=
 - =andi=, =ori=, =xori=
 - =slli=, =srli=, =srai=
 
