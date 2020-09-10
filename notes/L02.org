@@ -48,7 +48,7 @@ Example: =addi x3, x1, 3=
 
 *format*: =comp src1, src2, label=
 
-If the compare result is True, then go to the label branch.
+If the compare result is True, then *go to the label branch*.
 
 - =beq= (Branch EQual) ==
 - =bne= !=
