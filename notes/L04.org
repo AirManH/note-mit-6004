@@ -1,0 +1,40 @@
+* Procedures and MMIO
+
+** Recap: Activation frames and procedure calls
+
+- An /Acitivation frame/ holds a procedure call's data (args, return address, ...)
+- Activation frames are allocated in a stack manner (FIFO)
+- Top of the stack: current procedure's /activation frame/
+
+*** Acitivation Frame Structure
+
+Different compilers use different preset storage order.
+
+#+BEGIN_SRC text
+[...            ]
+[... (unused)   ]
+[...            ]
+[Local vars     ]
+[Saved Registers]
+[Saved ra       ]
+[Saved args     ]
+[...            ]
+[... (in used)  ]
+[...            ]
+#+END_SRC
+
+*** RISC-V Stack
+
+- stack is in memory
+- =sp= point to *last pushed element*
+
+#+begin_src text
+[ EMPTY        ]  lower address
+[ EMPTY        ]
+[ stacked data ]  <---- R[sp]
+[ stacked data ]
+[ stacked data ]
+[ stacked data ]
+[... (in used) ]
+[...           ]  higher address
+#+end_src
