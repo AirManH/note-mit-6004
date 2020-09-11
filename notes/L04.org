@@ -10,7 +10,7 @@
 
 Different compilers use different preset storage order.
 
-#+BEGIN_SRC text
+#+begin_example
 [...            ]
 [... (unused)   ]
 [...            ]
@@ -21,14 +21,14 @@ Different compilers use different preset storage order.
 [...            ]
 [... (in used)  ]
 [...            ]
-#+END_SRC
+#+end_example
 
 *** RISC-V Stack
 
 - stack is in memory
-- =sp= point to *last pushed element*
+- =sp= point to *last pushed element, not above*.
 
-#+begin_src text
+#+begin_example
 [ EMPTY        ]  lower address
 [ EMPTY        ]
 [ stacked data ]  <---- R[sp]
@@ -37,4 +37,117 @@ Different compilers use different preset storage order.
 [ stacked data ]
 [... (in used) ]
 [...           ]  higher address
+#+end_example
+
+** Recursive Procedure
+
+An example:
+
+#+begin_src c
+int fib(int n) {
+    if (n < 2)
+        return n;
+    else
+        return fib(n-1) + fib(n-2);
+}
 #+end_src
+
+#+begin_src asm
+fib:
+  li t0, 2
+  blt a0, t0, fib_done  ;; if a0 < 2, retrun
+  ;; save s0 here because:
+  ;; 1. fib() may be both callee and caller
+  ;; 2. in program we use s0 to save value, so it's our duty to keep this value
+  addi sp, sp, -8
+  sw ra, 4(sp)
+  sw s0, 0(sp)
+
+  mv s0, a0  ;; save n
+  addi a0, a0, -1
+  call fib
+  mv t0, s0  ;; t0 = n. WHY DO NOT WE SAVE T0 ON STACK?
+  mv s0, a0  ;; save fib(n-1)
+  addi a0, t0, -2
+  call fib
+  add a0, s0, a0  ;; result in a0
+
+  lw s0, 0(sp)
+  lw ra, 4(sp)
+  addi sp, sp, -8
+
+fib_done:
+  ret
+#+end_src
+
+** Passing arrays to a procedure
+
+*Key concept*: we are able to access memory outside its activation frame on the stack.
+
+** RISC-V Memory Layout
+
+#+begin_example
+| Main memory | Description                |
+|-------------+----------------------------| <- 0x0
+| Text(code)  | program code               | <---- pc(pointer counter)
+|-------------+----------------------------| <- gp(global pointer)
+| Static      | global variables           |
+|-------------+----------------------------|  |
+| Heap        | dynamically-allocated data |  |  grow
+|-------------+----------------------------| \|/
+| Unused      |                            |
+| Unused      |                            |
+| Unused      |                            | /|\
+|-------------+----------------------------|  |  grow  <- sp(stack pointer)
+| Stack       | used by procedure calls    |  |
+#+end_example
+
+** Passing Complex Data Structures as Arguments
+
+An example:
+
+#+begin_src c
+int maximum(int a[], int size) {
+  int max = 0;
+  for (int i = 0; i < size; i++) {
+    if (a[i] > max)
+      max = a[i];
+  }
+  return max;
+}
+
+int main() {
+  int ages[5] = {1, 2, 3, 4, 5};
+  int max = maximum(ages, 5);
+}
+#+end_src
+
+#+begin_src asm
+maximum:
+  mv t0, zero  ;; t0 as i
+  mv t1, zero  ;; t1 as max
+  j compare
+loop:
+  slli t2, t0, 2  ;; t2 = 4 * i
+  add t3, a0, t2  ;; t3 = a0 + 4 * i: addr of a[i]
+  lw t4, 0(t3)    ;; t4 = a[i]
+  ble t4, t1, endif  ;; if i < size
+  mv t1, t4       ;; max = a[i]
+endif:
+  addi t0, t0, 1  ;; i++
+compare:
+  blt t0, a1, loop
+
+  mv a0, t1       ;; a0 = max
+  ret
+#+end_src
+
+** Why not always use pointers arguments?
+
+1. It uses more structures than passing values.
+2. It takes more time on memory addressing.
+
+** Take Home Problem
+
+Q: How one would implement a procedure that requires 10 arguments(i.e., they can not all fit in the argument registers).
+A:
