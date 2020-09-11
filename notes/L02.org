@@ -27,8 +27,9 @@
 
 hard-coded constant number
 
-- =addi= (no =subi= here, because =addi x3, x1, -3= is enough. It's no need to reimplement another almost same operation)
-- =slti=, =sltiu=
+- =addi= (no =subi= here, because =addi x3, x1, -3= is enough. No need to reimplement.)
+- =slti=, =sltiu= (Set Less Than Immediately Unsigned)
+  - Example: =sltiu a1, a0, 1=, =if (a0 < 1) then a1 = 1 else a1 = 0=
 - =andi=, =ori=, =xori=
 - =slli=, =srli=, =srai=
 
@@ -40,7 +41,8 @@ Example: =addi x3, x1, 3=
 
 - base address is always stored in a register
 - offset is a small constant
-- **Format**: ={lw|sw} dest, offset(base Reg)=. Example: =lw x1, 0x4(x2)=
+- **Format**: ={lw|sw} dest, offset(base Reg)=
+  - Example: =lw x1, 0x4(x2) // set x1 = Mem[x2 + 0x4]= 
 - lw(Load Word), sw(Store Word)
 
 *** Control Flow
