@@ -1,0 +1,107 @@
+* Combinational Circuits: From Boolean Algebra to Gates
+
+** Combinational circuit
+
+- Combinational circuit has /binary/ inputs and outputs. $\text{Bool}^n \to \text{Bool}^m$
+
+** Famous gates
+
+- =NOT=: $s = \sim a$
+- =AND=: $s = a \cdot b$
+- =OR=: $s = a + b$
+- =NAND=: $s = \sim (a \cdot b)$
+- =NOR=: $s = \sim (a+b)$
+- =XOR= (exclusive or): $s = a \bigoplus b = (\sim a) \cdot b + a \cdot (\sim b)$
+
+** From Truth Table to Boolean Expression
+
+just focus on the lines that produce 1
+
+** Universal set of gates
+
+A set of gates is considered /universal/ if any Boolean function can be described using only those gates.
+
+- {AND, OR, NOT} (Proof: Any Truth Table can be represented as a Sum of Product)
+- {NAND}
+- {NOR}
+
+** Binary Addition
+
+Addition in base 2 is performed just like in base 10. Result and carry.
+
+*** Half adder
+
+$s = a \bigoplus b$, $c = a \cdot b$
+
+#+begin_example
+      |      |
+      |a     | b
+      v      v
+     ---------- 
+<---|    HA    |
+  c  ---------- 
+          |
+          | s
+	  v
+#+end_example
+
+**** TODO in BSV (Bluespec System Verilog)
+
+*** Full Adder
+
+#+begin_example
+      |      |
+      |a     | b
+      v      v
+     ---------- 
+<---|    HA    | <---
+     ----------  c_in 
+c_out     |
+          | s
+	  v
+#+end_example
+
+**** TODO in Bluespec
+
+*** Lager Adder
+
+$t_k = a_k \bigoplus b_k$, $s_k = t_k \bigoplus c_k$, $c_{k+1} = a_k \cdot b_k + c_k \cdot t_k$
+
+*** Selector
+
+#+begin_example
+            |
+            | i
+        |\  v
+        | \
+x0 -----|  \    4-way mux
+x1 -----|   | 
+x2 -----|   | --->
+x3 -----|  /
+        | /
+	|/
+#+end_example
+
+**** 2-way multiplexer
+
+#+begin_example
+     ---
+a --| 0 |
+    |   |--->
+b --| 1 |
+     ---
+      ^
+      | p
+#+end_example
+
+#+CAPTION: gate level implementation
+#+NAME: fig:2-way-mux
+[[./assets.L05/2-way-mux.png]]
+
+**** 4-way multiplexer
+
+An interesting design
+
+#+CAPTION: gate level implementation
+#+NAME: fig:4-way-mux
+[[./assets.L05/4-way-mux.png]]
