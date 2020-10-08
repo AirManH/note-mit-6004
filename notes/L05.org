@@ -37,9 +37,9 @@ $s = a \bigoplus b$, $c = a \cdot b$
       |      |
       |a     | b
       v      v
-     ---------- 
+     ----------
 <---|    HA    |
-  c  ---------- 
+  c  ----------
           |
           | s
 	  v
@@ -53,9 +53,9 @@ $s = a \bigoplus b$, $c = a \cdot b$
       |      |
       |a     | b
       v      v
-     ---------- 
+     ----------
 <---|    HA    | <---
-     ----------  c_in 
+     ----------  c_in
 c_out     |
           | s
 	  v
@@ -75,7 +75,7 @@ $t_k = a_k \bigoplus b_k$, $s_k = t_k \bigoplus c_k$, $c_{k+1} = a_k \cdot b_k +
         |\  v
         | \
 x0 -----|  \    4-way mux
-x1 -----|   | 
+x1 -----|   |
 x2 -----|   | --->
 x3 -----|  /
         | /
